@@ -1,0 +1,11 @@
+Video Source
+https://www.youtube.com/watch?v=l-83AtuHqM0
+
+Github for dataset
+https://github.com/Gaelim/youtube
+
+Application of Gradient Boost in power BI
+same dataset fortunately
+https://www.youtube.com/watch?v=DHO00nujmIY
+
+

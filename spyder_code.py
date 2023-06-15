@@ -1,0 +1,149 @@
+# 'dataset' holds the input data for this script
+
+#Code by Ammar Ahmed Siddiqui
+
+
+#_____________________________________________________________________
+#Importing generic
+#_____________________________________________________________________
+
+import pandas as pd
+import numpy as np
+
+
+#_____________________________________________________________________
+# Importing SKLEARN Library (after PIP installation
+#_____________________________________________________________________
+
+#Commons
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+# Prprocessors
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+# Models
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+
+#______________________
+# Loading dataset
+#______________________
+
+
+#remove this line if running script on POWER BI, otherwise it is required on ANACONDA/SPYDER !
+dataset = pd.read_csv('D:\IMPORTANT\MASTERS\BAHRIA UNIV\Spring2023 Semester\Assigments\TDS\Regression Analysis Datapack\HR_file_c.csv')
+
+
+#_____________________________________________________________________
+#lets change categories to numbers
+#_____________________________________________________________________
+
+dataset1 = dataset.copy(deep=True)
+
+encode = LabelEncoder()
+
+dataset1['departments']     = encode.fit_transform(dataset1['departments'])
+dataset1['salary']          	= encode.fit_transform(dataset1['salary'])
+
+#_____________________________________________________________________
+# Pro-processing data
+#_____________________________________________________________________
+
+selected_features = ['satisfaction_level',
+		'last_evaluation',
+		'number_projects',
+		'average_monthly_hours',
+		'time_spent_company',
+		'work_accidents',
+		'promotion_last_5years',
+		'departments',
+		'salary']
+
+
+y = dataset1['left']
+X = dataset1[selected_features]
+
+#_____________________________________________________________________
+
+# Data scaling & normalizing / Standarization
+#_____________________________________________________________________
+
+
+s = StandardScaler()
+X = s.fit_transform(X)
+
+#_____________________________________________________________________
+# Split the dataset
+#_____________________________________________________________________
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,y)
+
+#_____________________________________________________________________
+# Model Training - Logistic Regression
+#_____________________________________________________________________
+model1 = LogisticRegression()
+model1.fit(X_train, Y_train)
+
+#_____________________________________________________________________
+# Model Training - Gradient Boosting
+#_____________________________________________________________________
+model2 = GradientBoostingClassifier()
+model2.fit(X_train,Y_train)
+
+
+#_____________________________________________________________________
+# Model Training - Gradient Boosting
+#_____________________________________________________________________
+model3 = RandomForestClassifier()
+model3.fit(X_train,Y_train)
+
+
+
+#_____________________________________________________________________
+# Model Predictions on entire dataset (not just test)
+#_____________________________________________________________________
+
+y1_pred = model1.predict(X)
+y1_prob = model1.predict_proba(X)[:,1]
+
+y2_pred = model2.predict(X)
+y2_prob = model2.predict_proba(X)[:,1]
+
+y3_pred = model3.predict(X)
+y3_prob = model3.predict_proba(X)[:,1]
+
+
+
+#_____________________________________________________________________
+# Model Accuracies comparison
+#_____________________________________________________________________
+
+y1_test_pred = model1.predict(X_test)
+y2_test_pred = model2.predict(X_test)
+y3_test_pred = model3.predict(X_test)
+
+model_eval = pd.DataFrame(index=['Logistic Regression'],columns=['Score'])
+model_eval.loc['Logistic Regression','Score'] = accuracy_score(y1_test_pred,Y_test)
+model_eval.loc['Gradient Boosting','Score'] = accuracy_score(y2_test_pred,Y_test)
+model_eval.loc['Random Forest','Score'] = accuracy_score(y3_test_pred,Y_test)
+
+
+#_____________________________________________________________________
+# lets add colums back to the dataframe
+#_____________________________________________________________________
+dataset['LR_prediction'] = y1_pred
+dataset['GB_prediction'] = y2_pred
+dataset['RF_prediction'] = y3_pred
+
+
+dataset['LR_probabilities'] = y1_prob
+dataset['GB_probabilities'] = y2_prob
+dataset['RF_probabilities'] = y3_prob
+
+
+#_____________________________________________________________________
+# Deleting not required dataset
+#_____________________________________________________________________
+
+del dataset1
